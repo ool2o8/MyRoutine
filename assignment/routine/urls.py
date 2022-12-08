@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import CreateRoutine
+from .views import RoutineCreateView, RoutineListView, RoutineView
 urlpatterns = [
-    path('routine/', CreateRoutine.as_view({'post': 'post'})),
+    path('routines', RoutineCreateView.as_view()),
+    path('routines/<int:pk>',RoutineView.as_view({"get":"get","put":"update", "delete":"delete"})),
+    path('list', RoutineListView.as_view())
+    
 ]

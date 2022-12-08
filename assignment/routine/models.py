@@ -21,22 +21,27 @@ class Routine(models.Model):
 class RoutineResult(models.Model):
     id=models.BigAutoField(primary_key=True)
     routine=models.ForeignKey(Routine, on_delete=models.CASCADE, related_name='result')
-    result=models.BooleanField(default=False)
+    CHOICE=(
+        ('NOT','NOT'),
+        ('TRY', 'TRY'),
+        ('DONE','DONE')
+    )
+    result=models.CharField(choices=CHOICE, max_length=4, default='NOT')
     is_deleted=models.BooleanField(default=False)
     created_at=models.DateTimeField(default=datetime.now())
     modified_at=models.DateTimeField(null=True)
 
 class RoutineDay(models.Model):
-    DAY=(
-        ('MON', 'monday'),
-        ('TUE', 'tuesday'),
-        ('WED', 'wednesday'),
-        ('THU', 'thursday'),
-        ('FRI', 'friday'),
-        ('SAT', 'saturday'),
-        ('SUN', 'sunday')
+    CHOICES=(
+        ('MON','MON'),
+        ('TUE', 'TUE'),
+        ('WED','WED'),
+        ('THU', 'THU'),
+        ('FRI', 'FRI'),
+        ('SAT', 'SAT'),
+        ('SUN', 'SUN'),
     )
-    day=models.CharField(choices=DAY,max_length=3)
+    day=models.CharField(choices=CHOICES, max_length=3)
     routine=models.ForeignKey(Routine, on_delete=models.CASCADE, related_name='day')
     created_at=models.DateTimeField(default=datetime.now())
     modified_at=models.DateTimeField(null=True)
