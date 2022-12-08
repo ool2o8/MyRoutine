@@ -18,6 +18,7 @@ class Routine(models.Model):
     created_at=models.DateTimeField(default=datetime.now())
     modified_at=models.DateTimeField(null=True)
 
+
 class RoutineResult(models.Model):
     id=models.BigAutoField(primary_key=True)
     routine=models.ForeignKey(Routine, on_delete=models.CASCADE, related_name='result')
@@ -30,6 +31,7 @@ class RoutineResult(models.Model):
     is_deleted=models.BooleanField(default=False)
     created_at=models.DateTimeField(default=datetime.now())
     modified_at=models.DateTimeField(null=True)
+
 
 class RoutineDay(models.Model):
     CHOICES=(

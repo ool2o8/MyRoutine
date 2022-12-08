@@ -3,10 +3,12 @@ from rest_framework import serializers
 from django.core.exceptions import ValidationError
 import re
 
+
 class CreateUserSerializer(serializers.Serializer):
-    username=serializers.CharField(max_length=10)
-    email=serializers.EmailField()
-    password=serializers.CharField(max_length=20, help_text='특수문자, 숫자를 포함한 8글자 이상')
+    username = serializers.CharField(max_length=10)
+    email = serializers.EmailField()
+    password = serializers.CharField(
+        max_length=20, help_text='특수문자, 숫자를 포함한 8글자 이상')
 
     def validate_email(self, email):
         if User.objects.filter(email=email).exists():
@@ -22,6 +24,5 @@ class CreateUserSerializer(serializers.Serializer):
 
 class LoginSerializer(serializers.ModelSerializer):
     class Meta:
-        model=User
-        fields=['email', 'password']
-
+        model = User
+        fields = ['email', 'password']
