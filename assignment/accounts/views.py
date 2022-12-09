@@ -1,44 +1,45 @@
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
-from rest_framework import status
 from django.core.exceptions import ValidationError
-from .serializers import CreateUserSerializer, LoginSerializer
+from .serializers import CreateUserSerializer, LoginSerializer,SignUpSerializer
 from .models import User
 from django.contrib.auth import authenticate, login, logout
+from rest_framework.permissions import AllowAny
 
 
-class CreateUser(viewsets.ModelViewSet):
+class SignUpView(viewsets.ModelViewSet):
     serializer_class = CreateUserSerializer
 
     def post(self, request):
         serializer = CreateUserSerializer(data=request.data)
-        try:
-            if serializer.is_valid(raise_exception=True):
-                user = User.objects.create_user(
-                    username=request.POST['username'],
-                    email=request.POST['email'],
-                    password=request.POST['password']
-                )
-                return Response("UserCreate complete", status=status.HTTP_201_CREATED)
-        except:
-            return Response("Validation error", status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid(raise_exception=True):
+            user = User.objects.create_user(
+                username=serializer.data['username'],
+                email=serializer.data['email'],
+                password=serializer.data['password']
+            )
+            return Response("UserCreate complete", status=status.HTTP_201_CREATED)
+        return Response("Validation error", status=status.HTTP_400_BAD_REQUEST)
+        
 
-
-class Login(viewsets.ModelViewSet):
+class LoginView(viewsets.ModelViewSet):
     serializer_class = LoginSerializer
 
     def post(self, request):
-        user = authenticate(
-            request, email=request.POST['email'], password=request.POST['password'])
-        if user is not None:
+        serializer=LoginSerializer(request.data)
+        email=serializer.data['email']
+        password=serializer.data['password']
+        print(email, password)
+        user = authenticate(request, email=email, password=password)
+        print(user)
+        if user:
             login(request, user)
             return Response("로그인 성공", status=status.HTTP_200_OK)
-        else:
-            return Response("로그인에 실패하였습니다.", ststus=status.HTTP_400_BAD_REQUEST)
+        return Response("로그인에 실패하였습니다.", status=status.HTTP_400_BAD_REQUEST)
 
 
-class Logout(viewsets.ModelViewSet):
+class LogoutView(viewsets.ModelViewSet):
     def get(self, request):
         logout(request)
         return Response("로그아웃", status=status.HTTP_200_OK)

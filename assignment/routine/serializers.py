@@ -19,7 +19,7 @@ class CreateRoutineSerializer(serializers.Serializer):
     )
     days = serializers.ListSerializer(
         child=serializers.ChoiceField(choices=CHOICES))
-
+        
 
 class ResultSerialzier(serializers.ModelSerializer):
     class Meta:
