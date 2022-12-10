@@ -6,7 +6,7 @@ from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Routine, RoutineDay, RoutineResult
-from .serializers import CreateRoutineSerializer, RoutineListSerializer, RoutineRetrieveSerializer, RoutineSerializer
+from .serializers import CreateRoutineSerializer, RoutineListSerializer, RoutineRetrieveSerializer, RoutineSerializer, roitinelistserializer
 from datetime import datetime
 
 class RoutineCreateView(APIView):
@@ -34,11 +34,29 @@ class RoutineCreateView(APIView):
             return Response("invalid", status=status.HTTP_400_BAD_REQUEST)
 
 
-class RoutineListView(APIView):
-    permission_classes = [IsAuthenticated]
+# class RoutineListView(APIView):
+#     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        CHOICES = (
+#     def get(self, request):
+#         CHOICES = (
+#             ('MON'),
+#             ('TUE'),
+#             ('WED'),
+#             ('THU'),
+#             ('FRI'),
+#             ('SAT'),
+#             ('SUN'),
+#         )
+#         day = datetime.today().weekday()
+#         queryset = RoutineResult.objects.select_related('routine').filter(
+#             routine__account=request.user, routine__day__day=CHOICES[day]).all()
+#         serializer = RoutineListSerializer(queryset, many=True)
+#         return Response({"data": serializer.data, "message": {"msg": "Routine lookup was successful.", "status": "ROUTINE_LIST_OK"}}, status=status.HTTP_200_OK)
+
+class RoutineListView(generics.ListAPIView):
+    permission_classes=[IsAuthenticated]
+    serializer_class=roitinelistserializer
+    CHOICES = (
             ('MON'),
             ('TUE'),
             ('WED'),
@@ -47,12 +65,8 @@ class RoutineListView(APIView):
             ('SAT'),
             ('SUN'),
         )
-        day = datetime.today().weekday()
-        queryset = RoutineResult.objects.select_related('routine').filter(
-            routine__account=request.user, routine__day__day=CHOICES[day]).all()
-        serializer = RoutineListSerializer(queryset, many=True)
-        return Response({"data": serializer.data, "message": {"msg": "Routine lookup was successful.", "status": "ROUTINE_LIST_OK"}}, status=status.HTTP_200_OK)
-
+    day = datetime.today().weekday()
+    queryset=Routine.objects.prefetch_related('result').prefetch_related('day').filter(day__day=CHOICES[day])
 
 class RoutineView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]

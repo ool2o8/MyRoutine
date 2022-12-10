@@ -31,10 +31,11 @@ class RoutineTests(APITestCase):
         )
         self.user.set_password('mijung1208!')
         self.user.save()
+        self.client.login(email='ncr7804@naver.com', password='mijung1208!')
 
     def test_create_routine(self):
         url = reverse('routine-routines')
-        self.client.login(email='ncr7804@naver.com', password='mijung1208!')
+        
         data = {
             "title":fake.sentence(),
             "category":"HOMEWORK",

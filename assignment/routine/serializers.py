@@ -19,7 +19,7 @@ class CreateRoutineSerializer(serializers.Serializer):
     )
     days = serializers.ListSerializer(
         child=serializers.ChoiceField(choices=CHOICES))
-        
+
 
 class ResultSerialzier(serializers.ModelSerializer):
     class Meta:
@@ -41,7 +41,6 @@ class RoutineSerializer(serializers.ModelSerializer):
 
 class RoutineListSerializer(serializers.ModelSerializer):
     routine = RoutineSerializer()
-
     class Meta:
         model = RoutineResult
         fields = ['routine', 'result']
@@ -61,3 +60,11 @@ class RoutineRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoutineResult
         fields = ['routine', 'result']
+
+
+class roitinelistserializer(serializers.ModelSerializer):
+    result=serializers.ResultSerialzier(read_only=True)
+
+    class Meta:
+        model=Routine
+        fields=[ 'goal', 'account_id', 'result','title']

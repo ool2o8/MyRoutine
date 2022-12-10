@@ -48,5 +48,20 @@ class AccountTests(APITestCase):
         if response.status_code==201 or response.status_code==400:
             result+=1
         self.assertEqual(1,result)
-
-
+    
+    def test_account_login(self):
+        url = reverse('accounts-login')
+        self.client = APIClient()
+        user=User.objects.create(
+            email="ncr7804@naver.com",
+            username="ool2o8",
+        )
+        user.set_password('mijung1208!')
+        user.save()
+        data = {
+            "email": "ncr7804@naver.com",
+            "password": "mijung1208!"
+        }
+        print(data)
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code,200)
