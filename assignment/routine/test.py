@@ -11,6 +11,8 @@ from accounts.factories import UserFactory
 from django.urls import path, include, reverse
 from rest_framework.test import force_authenticate, APIRequestFactory
 from accounts.models import User
+from .factories import RoutineFactory
+from .models import Routine, RoutineDay, RoutineResult
 
 
 
@@ -18,9 +20,9 @@ fake = Faker()
 fake_ko = Faker('ko_KR')
 
 
-class RoutineTests(APITestCase):
+class RoutineCreateTests(APITestCase):
     urlpatterns = [
-        path('routines/', include('routine.urls')),
+        path('routines', include('routine.urls')),
     ]
 
     def setUp(self):
@@ -34,7 +36,7 @@ class RoutineTests(APITestCase):
         self.client.login(email='ncr7804@naver.com', password='mijung1208!')
 
     def test_create_routine(self):
-        url = reverse('routine-routines')
+        url = reverse('routine-create')
         
         data = {
             "title":fake.sentence(),
@@ -47,6 +49,54 @@ class RoutineTests(APITestCase):
 
         response = self.client.post(url, data, format='json')
         print(response)
+        print(response.status_code)
+
+
+class AfterRoutineCreateTest(APIClient):
+    urlpatterns = [
+        path('routines', include('routine.urls')),
+    ]
+
+    def setUp(self):
+        self.client = APIClient()
+        user=User.objects.create(
+            email="ncr7804@naver.com",
+            username="ool2o8",
+        )
+        user.set_password('mijung1208!')
+        user.save()
+        self.client.login(email='ncr7804@naver.com', password='mijung1208!')
+        routine=Routine.objects.create(
+            title="problem solving5",
+            category="HOMEWORK",
+            goal="goal",
+            is_alarm="true",
+            days=["MON", "SAT"]
+        )
+        
+
+    def test_routine_update(self):
+        url = 'routines/1/update'
+        routine=RoutineFactory()
+        data = {
+            "routine":routine.id,
+            "title":"problem solving5",
+            "category":"HOMEWORK",
+            "goal":"goal",
+            "is_alarm":"true",
+            "days":["MON", "FRI"]
+        }
+        print(data)
+
+        response = self.client.put(url, data, format='json')
+        print(response)
+        print(response.status_code)
+
+    def test_routine_list(self):
+        url = reverse('routine-list')
+
+        response = self.client.get(url,format='json')
+        print(response['data'])
         print(response.status_code)
 
     

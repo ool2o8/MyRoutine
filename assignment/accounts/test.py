@@ -20,7 +20,7 @@ fake_ko = Faker('ko_KR')
 
 class AccountTests(APITestCase):
     urlpatterns = [
-        path('accounts/', include('accounts.urls')),
+        path('accounts', include('accounts.urls')),
     ]
 
     def setUp(self):

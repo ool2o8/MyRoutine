@@ -1,10 +1,11 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import RoutineCreateView, RoutineListView, RoutineView, RoutineListView
+from .views import RoutineCreateView, RoutineListView, RoutineView, RoutineListView, RoutineUpdateView
 urlpatterns = [
-    path('routines', RoutineCreateView.as_view(), name='routine-routines'),
-    path('routines/<int:pk>',RoutineView.as_view({"get":"get","put":"put", "delete":"delete"}), name='routine-routines-detail'),
-    path('list', RoutineListView.as_view(), name='routine-list')
-  
+    path('', RoutineCreateView.as_view(), name='routine-create'),
+    path('/routines', RoutineListView.as_view(), name='routine-list'),
+    path('/routines/<int:pk>', RoutineView.as_view(), name='routine-detail'),
+    path('/routines/<int:pk>/update', RoutineUpdateView.as_view(), name='routine-update')
+    
 ]

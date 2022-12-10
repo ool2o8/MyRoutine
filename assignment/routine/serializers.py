@@ -1,8 +1,15 @@
 from .models import Routine, RoutineDay, RoutineResult
 from rest_framework import serializers
+from rest_framework.response import Response
 
 
-class CreateRoutineSerializer(serializers.Serializer):
+class DaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RoutineDay
+        fields = ['day']
+
+
+class CreateUpdateRoutineSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=50)
     category = serializers.ChoiceField(
         choices=[('MIRACLE'), ('HOMEWORK'),], required=True)
@@ -21,50 +28,23 @@ class CreateRoutineSerializer(serializers.Serializer):
         child=serializers.ChoiceField(choices=CHOICES))
 
 
-class ResultSerialzier(serializers.ModelSerializer):
-    class Meta:
-        model = RoutineResult
-        fields = ['result']
-
-
-class DaySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RoutineDay
-        fields = ['day']
-
-
 class RoutineSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='account_id')
+    result=serializers.SlugRelatedField(read_only=True, slug_field='result')
     class Meta:
-        model = Routine
-        fields = ['goal', 'account_id', 'title']
-
-
-class RoutineListSerializer(serializers.ModelSerializer):
-    routine = RoutineSerializer()
-    class Meta:
-        model = RoutineResult
-        fields = ['routine', 'result']
+        model=Routine
+        fields=['goal', 'id', 'result','title']
 
 
 class RoutineDetailSerializer(serializers.ModelSerializer):
-    day = serializers.ListSerializer(child=DaySerializer(read_only=True))
-
+    id = serializers.CharField(source='account_id')
+    result=serializers.SlugRelatedField(read_only=True, slug_field='result')
+    days = serializers.SlugRelatedField(read_only=True, slug_field='day', many=True)
     class Meta:
         model = Routine
-        fields = ['goal', 'account_id', 'title', 'day']
+        fields = ['goal', 'id','result', 'title', 'days']
 
 
-class RoutineRetrieveSerializer(serializers.ModelSerializer):
-    routine = RoutineDetailSerializer()
-
-    class Meta:
-        model = RoutineResult
-        fields = ['routine', 'result']
+        
 
 
-class roitinelistserializer(serializers.ModelSerializer):
-    result=serializers.ResultSerialzier(read_only=True)
-
-    class Meta:
-        model=Routine
-        fields=[ 'goal', 'account_id', 'result','title']

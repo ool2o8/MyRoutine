@@ -6,12 +6,14 @@ from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Routine, RoutineDay, RoutineResult
-from .serializers import CreateRoutineSerializer, RoutineListSerializer, RoutineRetrieveSerializer, RoutineSerializer, roitinelistserializer
+from .serializers import CreateUpdateRoutineSerializer, RoutineDetailSerializer, RoutineSerializer
 from datetime import datetime
 
-class RoutineCreateView(APIView):
+class RoutineCreateView(generics.CreateAPIView):
+    permission_classes=[IsAuthenticated]
+    serializer_class=CreateUpdateRoutineSerializer
     def post(self, request):
-        serializer = CreateRoutineSerializer(data=request.data)
+        serializer = CreateUpdateRoutineSerializer(data=request.data)
         if serializer.is_valid():
             routine = Routine.objects.create(
                 account=request.user,
@@ -34,29 +36,12 @@ class RoutineCreateView(APIView):
             return Response("invalid", status=status.HTTP_400_BAD_REQUEST)
 
 
-# class RoutineListView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request):
-#         CHOICES = (
-#             ('MON'),
-#             ('TUE'),
-#             ('WED'),
-#             ('THU'),
-#             ('FRI'),
-#             ('SAT'),
-#             ('SUN'),
-#         )
-#         day = datetime.today().weekday()
-#         queryset = RoutineResult.objects.select_related('routine').filter(
-#             routine__account=request.user, routine__day__day=CHOICES[day]).all()
-#         serializer = RoutineListSerializer(queryset, many=True)
-#         return Response({"data": serializer.data, "message": {"msg": "Routine lookup was successful.", "status": "ROUTINE_LIST_OK"}}, status=status.HTTP_200_OK)
-
 class RoutineListView(generics.ListAPIView):
     permission_classes=[IsAuthenticated]
-    serializer_class=roitinelistserializer
-    CHOICES = (
+    serializer_class=RoutineSerializer
+    
+    def get(self, request):
+        CHOICES = (
             ('MON'),
             ('TUE'),
             ('WED'),
@@ -65,32 +50,38 @@ class RoutineListView(generics.ListAPIView):
             ('SAT'),
             ('SUN'),
         )
-    day = datetime.today().weekday()
-    queryset=Routine.objects.prefetch_related('result').prefetch_related('day').filter(day__day=CHOICES[day])
+        day = datetime.today().weekday()
+        queryset=Routine.objects.prefetch_related('result').prefetch_related('days').filter(days__day=CHOICES[day])
+        serializer=RoutineSerializer(queryset, many=True)
+        return Response({"data": serializer.data, "message": {"msg": "Routine lookup was successful.", "status": "ROUTINE_LIST_OK"}}, status=status.HTTP_200_OK)
 
-class RoutineView(viewsets.ModelViewSet):
+# class RoutineRetrieveDestroyUpdateView(generics.)
+class RoutineView(generics.RetrieveDestroyAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = RoutineRetrieveSerializer
-    queryset = RoutineResult.objects.select_related('routine').all()
-
+    serializer_class = RoutineDetailSerializer
+    
     def get(self, request, pk):
-        queryset = RoutineResult.objects.select_related('routine').filter(
-            routine__account=request.user, routine__id=pk).first()
+        queryset = Routine.objects.prefetch_related('result').filter(
+            account=request.user, pk=pk).first()
 
         if not queryset:
             return Response({"message": {"msg": "Routine not extists.", "status": "ROUTINE_DETAIL_FAIL"}}, status=status.HTTP_204_NO_CONTENT)
 
-        serializer = RoutineRetrieveSerializer(queryset)
+        serializer = RoutineDetailSerializer(queryset)
         return Response({"data": serializer.data, "message": {"msg": "Routine lookup was successful.", "status": "ROUTINE_DETAIL_OK"}}, status=status.HTTP_200_OK)
 
     def delete(self, request, pk):
         Routine.objects.filter(account=request.user, pk=pk).delete()
         return Response({"data":  {"routine_id": pk}, "message": {"msg": "The routine has been deleted.", "status": "ROUTINE_DELETE_OK"}}, status=status.HTTP_200_OK)
 
-    def put(self, request, pk):
-        serializer = CreateRoutineSerializer(data=request.data)
-        routine = Routine.objects.get(pk=pk)
+class RoutineUpdateView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CreateUpdateRoutineSerializer
 
+    def put(self, request, pk):
+        routine = Routine.objects.get(account=request.user,pk=pk)
+        serializer = CreateUpdateRoutineSerializer(data=request.data)
+        
         if serializer.is_valid():
             routine.title = serializer.data['title']
             routine.category = serializer.data['category']
@@ -110,4 +101,4 @@ class RoutineView(viewsets.ModelViewSet):
                 routine=routine,
                 modified_at=datetime.now()
             )
-        return Response({"data":  {"routine_id": pk}, "message": {"msg": "The routine has been modified.", "status": "ROUTINE_UPDATE_OK"}}, status=status.HTTP_200_OK)
+        return Response({"data":  {"routine_id": pk}, "message": {"msg": "The routine has been modified.", "status": "ROUTINE_UPDATE_OK"}}, status=status.HTTP_201_CREATED)
