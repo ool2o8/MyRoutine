@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.core.exceptions import ValidationError
 import re
 
+
 class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=20)
     email = serializers.EmailField()
@@ -17,8 +18,10 @@ class SignUpSerializer(serializers.Serializer):
     def validate_password(self, password):
         PASSWORD_VALIDATION = r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$'
         if not re.match(PASSWORD_VALIDATION, password):
-            raise ValidationError("비밀번호는 8글자 이상이며 특수문자($@$!%*#?&), 숫자를 포함해야 합니다.")
+            raise ValidationError(
+                "비밀번호는 8글자 이상이며 특수문자($@$!%*#?&), 숫자를 포함해야 합니다.")
         return password
+
 
 class CreateUserSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=20)
@@ -34,7 +37,8 @@ class CreateUserSerializer(serializers.Serializer):
     def validate_password(self, password):
         PASSWORD_VALIDATION = r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$'
         if not re.match(PASSWORD_VALIDATION, password):
-            raise ValidationError("비밀번호는 8글자 이상이며 특수문자($@$!%*#?&), 숫자를 포함해야 합니다.")
+            raise ValidationError(
+                "비밀번호는 8글자 이상이며 특수문자($@$!%*#?&), 숫자를 포함해야 합니다.")
         return password
 
 

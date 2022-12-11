@@ -3,7 +3,6 @@ from rest_framework.test import APIClient
 import string
 import random
 from rest_framework.test import APITestCase
-from accounts.factories import UserFactory
 from django.urls import path, include, reverse
 from .models import User
 

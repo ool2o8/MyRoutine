@@ -1,12 +1,5 @@
-from .models import Routine, RoutineDay, RoutineResult
+from .models import Routine
 from rest_framework import serializers
-from rest_framework.response import Response
-
-
-class DaySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RoutineDay
-        fields = ['day']
 
 
 class CreateUpdateRoutineSerializer(serializers.Serializer):
@@ -30,21 +23,19 @@ class CreateUpdateRoutineSerializer(serializers.Serializer):
 
 class RoutineSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='account_id')
-    result=serializers.SlugRelatedField(read_only=True, slug_field='result')
+    result = serializers.SlugRelatedField(read_only=True, slug_field='result')
+
     class Meta:
-        model=Routine
-        fields=['goal', 'id', 'result','title']
+        model = Routine
+        fields = ['goal', 'id', 'result', 'title']
 
 
 class RoutineDetailSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='account_id')
-    result=serializers.SlugRelatedField(read_only=True, slug_field='result')
-    days = serializers.SlugRelatedField(read_only=True, slug_field='day', many=True)
+    result = serializers.SlugRelatedField(read_only=True, slug_field='result')
+    days = serializers.SlugRelatedField(
+        read_only=True, slug_field='day', many=True)
+
     class Meta:
         model = Routine
-        fields = ['goal', 'id','result', 'title', 'days']
-
-
-        
-
-
+        fields = ['goal', 'id', 'result', 'title', 'days']

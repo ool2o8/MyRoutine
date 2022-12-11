@@ -1,6 +1,3 @@
-from django.shortcuts import render
-from rest_framework import viewsets
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
@@ -8,10 +5,13 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Routine, RoutineDay, RoutineResult
 from .serializers import CreateUpdateRoutineSerializer, RoutineDetailSerializer, RoutineSerializer
 from datetime import datetime
+from django.db.models import Q
+
 
 class RoutineCreateView(generics.CreateAPIView):
-    permission_classes=[IsAuthenticated]
-    serializer_class=CreateUpdateRoutineSerializer
+    permission_classes = [IsAuthenticated]
+    serializer_class = CreateUpdateRoutineSerializer
+
     def post(self, request):
         serializer = CreateUpdateRoutineSerializer(data=request.data)
         if serializer.is_valid():
@@ -37,9 +37,9 @@ class RoutineCreateView(generics.CreateAPIView):
 
 
 class RoutineListView(generics.ListAPIView):
-    permission_classes=[IsAuthenticated]
-    serializer_class=RoutineSerializer
-    
+    permission_classes = [IsAuthenticated]
+    serializer_class = RoutineSerializer
+
     def get(self, request):
         CHOICES = (
             ('MON'),
@@ -51,17 +51,18 @@ class RoutineListView(generics.ListAPIView):
             ('SUN'),
         )
         day = datetime.today().weekday()
-        queryset=Routine.objects.prefetch_related('result').prefetch_related('days').filter(days__day=CHOICES[day])
-        serializer=RoutineSerializer(queryset, many=True)
+        queryset = Routine.objects.prefetch_related(
+            'result').filter(days__day=CHOICES[day])
+        serializer = RoutineSerializer(queryset, many=True)
         return Response({"data": serializer.data, "message": {"msg": "Routine lookup was successful.", "status": "ROUTINE_LIST_OK"}}, status=status.HTTP_200_OK)
 
-# class RoutineRetrieveDestroyUpdateView(generics.)
+
 class RoutineView(generics.RetrieveDestroyAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = RoutineDetailSerializer
-    
+
     def get(self, request, pk):
-        queryset = Routine.objects.prefetch_related('result').filter(
+        queryset = Routine.objects.filter(
             account=request.user, pk=pk).first()
 
         if not queryset:
@@ -74,14 +75,15 @@ class RoutineView(generics.RetrieveDestroyAPIView):
         Routine.objects.filter(account=request.user, pk=pk).delete()
         return Response({"data":  {"routine_id": pk}, "message": {"msg": "The routine has been deleted.", "status": "ROUTINE_DELETE_OK"}}, status=status.HTTP_200_OK)
 
+
 class RoutineUpdateView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CreateUpdateRoutineSerializer
 
     def put(self, request, pk):
-        routine = Routine.objects.get(account=request.user,pk=pk)
+        routine = Routine.objects.get(account=request.user, pk=pk)
         serializer = CreateUpdateRoutineSerializer(data=request.data)
-        
+
         if serializer.is_valid():
             routine.title = serializer.data['title']
             routine.category = serializer.data['category']
@@ -89,16 +91,12 @@ class RoutineUpdateView(generics.UpdateAPIView):
             routine.is_alarm = serializer.data['is_alarm']
             routine.modified_at = datetime.now()
             routine.save()
-            RoutineDay.objects.filter(routine=routine).delete()
-            RoutineResult.objects.filter(routine=routine).delete()
-            for i in serializer.data['days']:
-                RoutineDay.objects.create(
-                    day=i,
-                    routine=routine,
-                    modified_at=datetime.now()
+            RoutineDay.objects.filter(routine=routine).exclude(
+                day__in=serializer.data['days']).delete()
+            for day in serializer.data['days']:
+                RoutineDay.objects.filter(Q(routine=routine) & Q(day__in=serializer.data["days"])).get_or_create(
+                    day=day,
+                    routine=routine
                 )
-            RoutineResult.objects.create(
-                routine=routine,
-                modified_at=datetime.now()
-            )
+
         return Response({"data":  {"routine_id": pk}, "message": {"msg": "The routine has been modified.", "status": "ROUTINE_UPDATE_OK"}}, status=status.HTTP_201_CREATED)

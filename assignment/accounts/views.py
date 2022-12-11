@@ -1,11 +1,10 @@
 from django.shortcuts import render
-from rest_framework import viewsets, status, generics
+from rest_framework import viewsets, status
 from rest_framework.response import Response
-from django.core.exceptions import ValidationError
-from .serializers import CreateUserSerializer, LoginSerializer,SignUpSerializer
+from .serializers import CreateUserSerializer, LoginSerializer, SignUpSerializer
 from .models import User
 from django.contrib.auth import authenticate, login, logout
-from rest_framework.permissions import AllowAny
+
 
 
 class SignUpView(viewsets.ModelViewSet):
@@ -21,15 +20,15 @@ class SignUpView(viewsets.ModelViewSet):
             )
             return Response("UserCreate complete", status=status.HTTP_201_CREATED)
         return Response("Validation error", status=status.HTTP_400_BAD_REQUEST)
-        
+
 
 class LoginView(viewsets.ModelViewSet):
     serializer_class = LoginSerializer
 
     def post(self, request):
-        serializer=LoginSerializer(request.data)
-        email=serializer.data['email']
-        password=serializer.data['password']
+        serializer = LoginSerializer(request.data)
+        email = serializer.data['email']
+        password = serializer.data['password']
         user = authenticate(request, email=email, password=password)
         if user:
             login(request, user)

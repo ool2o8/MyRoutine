@@ -1,7 +1,6 @@
 from django.db import models
 from accounts.models import User
-from multiselectfield import MultiSelectField
-from datetime import datetime
+
 
 class Routine(models.Model):
     category_choices=[
