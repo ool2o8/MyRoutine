@@ -1,15 +1,10 @@
 from faker import Faker
-from unittest.mock import patch
 from rest_framework.test import APIClient
 import string
 import random
-import factory.fuzzy
-from django.test import Client
-from django.test.testcases import TestCase
 from rest_framework.test import APITestCase
 from accounts.factories import UserFactory
 from django.urls import path, include, reverse
-from rest_framework.test import force_authenticate, APIRequestFactory
 from .models import User
 
 
