@@ -11,7 +11,7 @@ from accounts.factories import UserFactory
 from django.urls import path, include, reverse
 from rest_framework.test import force_authenticate, APIRequestFactory
 from accounts.models import User
-from .factories import RoutineFactory
+from .factories import RoutineFactory, RoutineResultFactory, RoutineDayFactory
 from .models import Routine, RoutineDay, RoutineResult
 
 
@@ -39,64 +39,69 @@ class RoutineCreateTests(APITestCase):
         url = reverse('routine-create')
         
         data = {
-            "title":fake.sentence(),
+            "title":fake.text(max_nb_chars=20),
             "category":"HOMEWORK",
-            "goal":fake.sentence(),
+            "goal":fake.text(max_nb_chars=20),
             "is_alarm":"true",
             "days":["MON", "TUE"]
         }
-        print(data)
-
         response = self.client.post(url, data, format='json')
-        print(response)
-        print(response.status_code)
+        self.assertEqual(response.status_code,201)
 
 
-class AfterRoutineCreateTest(APIClient):
+class AfterRoutineCreateTests(APITestCase):
     urlpatterns = [
         path('routines', include('routine.urls')),
     ]
 
     def setUp(self):
         self.client = APIClient()
-        user=User.objects.create(
+        self.user=User.objects.create(
             email="ncr7804@naver.com",
             username="ool2o8",
         )
-        user.set_password('mijung1208!')
-        user.save()
+        self.user.set_password('mijung1208!')
+        self.user.save()
         self.client.login(email='ncr7804@naver.com', password='mijung1208!')
-        routine=Routine.objects.create(
-            title="problem solving5",
-            category="HOMEWORK",
-            goal="goal",
-            is_alarm="true",
-            days=["MON", "SAT"]
-        )
-        
+
+        self.routine=RoutineFactory(account=self.user)
+        self.routine_day=RoutineDayFactory(routine=self.routine)
+        self.routine_result=RoutineResultFactory(routine=self.routine)
+    
 
     def test_routine_update(self):
-        url = 'routines/1/update'
-        routine=RoutineFactory()
+        url = reverse('routine-update', kwargs={'pk': self.routine.id})
+        
         data = {
-            "routine":routine.id,
             "title":"problem solving5",
             "category":"HOMEWORK",
             "goal":"goal",
             "is_alarm":"true",
-            "days":["MON", "FRI"]
+            "days":["MON"]
         }
-        print(data)
-
+        
         response = self.client.put(url, data, format='json')
-        print(response)
-        print(response.status_code)
+        self.assertEqual(response.status_code,201)
 
+
+    def test_routine_retrieve(self):
+        url=reverse('routine-detail', kwargs={'pk': self.routine.id})
+        response = self.client.get(url,format='json')
+        self.assertEqual(response.status_code,200)
+
+    def test_routine_destroy(self):
+        url=reverse('routine-detail', kwargs={'pk': self.routine.id})
+        response = self.client.delete(url,format='json')
+        self.assertEqual(response.status_code,200)
+        response = self.client.get(url,format='json')
+        self.assertEqual(response.status_code,204)
+        
     def test_routine_list(self):
         url = reverse('routine-list')
-
         response = self.client.get(url,format='json')
-        print(response['data'])
-        print(response.status_code)
+        self.assertEqual(response.status_code,200)
+
+    
+        
 
     

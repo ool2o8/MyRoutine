@@ -15,8 +15,8 @@ class Routine(models.Model):
     goal=models.CharField(max_length=200)
     is_alarm=models.BooleanField(default=False)
     is_deleted=models.BooleanField(default=False)
-    created_at=models.DateTimeField(default=datetime.now())
-    modified_at=models.DateTimeField(null=True)
+    created_at=models.DateTimeField(auto_now_add=True)
+    modified_at=models.DateTimeField(auto_now=True, null=True)
 
 
 class RoutineResult(models.Model):
@@ -29,8 +29,8 @@ class RoutineResult(models.Model):
     )
     result=models.CharField(choices=CHOICE, max_length=4, default='NOT')
     is_deleted=models.BooleanField(default=False)
-    created_at=models.DateTimeField(default=datetime.now())
-    modified_at=models.DateTimeField(null=True)
+    created_at=models.DateTimeField(auto_now_add=True)
+    modified_at=models.DateTimeField(auto_now=True, null=True)
 
 
 class RoutineDay(models.Model):
@@ -45,5 +45,5 @@ class RoutineDay(models.Model):
     )
     day=models.CharField(choices=CHOICES, max_length=3)
     routine=models.ForeignKey(Routine, on_delete=models.CASCADE, related_name='days')
-    created_at=models.DateTimeField(default=datetime.now())
-    modified_at=models.DateTimeField(null=True)
+    created_at=models.DateTimeField(auto_now_add=True)
+    modified_at=models.DateTimeField(auto_now=True, null=True)

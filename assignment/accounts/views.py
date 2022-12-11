@@ -30,9 +30,7 @@ class LoginView(viewsets.ModelViewSet):
         serializer=LoginSerializer(request.data)
         email=serializer.data['email']
         password=serializer.data['password']
-        print(email, password)
         user = authenticate(request, email=email, password=password)
-        print(user)
         if user:
             login(request, user)
             return Response("로그인 성공", status=status.HTTP_200_OK)

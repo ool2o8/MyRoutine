@@ -43,7 +43,6 @@ class AccountTests(APITestCase):
         }
         
         response = self.client.post(url, data, format='json')
-        print(response.status_code)
         result=0
         if response.status_code==201 or response.status_code==400:
             result+=1
@@ -62,6 +61,5 @@ class AccountTests(APITestCase):
             "email": "ncr7804@naver.com",
             "password": "mijung1208!"
         }
-        print(data)
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code,200)

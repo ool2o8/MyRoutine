@@ -10,7 +10,7 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
-
+    last_login = models.DateTimeField(auto_now=True, null=True)
     class Meta:
         db_table = 'user'
 
