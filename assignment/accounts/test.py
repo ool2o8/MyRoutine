@@ -42,7 +42,7 @@ class AccountTests(APITestCase):
             result+=1
         self.assertEqual(1,result)
     
-    def test_account_login(self):
+    def test_account_login_로그인(self):
         url = reverse('accounts-login')
         self.client = APIClient()
         user=User.objects.create(
@@ -56,4 +56,5 @@ class AccountTests(APITestCase):
             "password": "mijung1208!"
         }
         response = self.client.post(url, data, format='json')
+        self.assertEqual(response.data, "로그인 성공")
         self.assertEqual(response.status_code,200)

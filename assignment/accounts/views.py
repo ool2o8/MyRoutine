@@ -1,17 +1,17 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import CreateUserSerializer, LoginSerializer, SignUpSerializer
+from .serializers import LoginSerializer, SignUpSerializer
 from .models import User
 from django.contrib.auth import authenticate, login, logout
 
 
 
 class SignUpView(viewsets.ModelViewSet):
-    serializer_class = CreateUserSerializer
+    serializer_class = SignUpSerializer
 
     def post(self, request):
-        serializer = CreateUserSerializer(data=request.data)
+        serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = User.objects.create_user(
                 username=serializer.data['username'],

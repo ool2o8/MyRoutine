@@ -13,7 +13,7 @@ fake_ko = Faker('ko_KR')
 
 class RoutineCreateTests(APITestCase):
     urlpatterns = [
-        path('routines', include('routine.urls')),
+        path('routines', include('routines.urls')),
     ]
 
     def setUp(self):
@@ -37,7 +37,7 @@ class RoutineCreateTests(APITestCase):
 
 class AfterRoutineCreateTests(APITestCase):
     urlpatterns = [
-        path('routines', include('routine.urls')),
+        path('routines', include('routines.urls')),
     ]
 
     def setUp(self):
@@ -49,7 +49,7 @@ class AfterRoutineCreateTests(APITestCase):
         self.routine_day = RoutineDayFactory(routine=self.routine)
         self.routine_result = RoutineResultFactory(routine=self.routine)
 
-    def test_routine_update(self):
+    def test_routine_수정(self):
         url = reverse('routine-update', kwargs={'pk': self.routine.id})
 
         data = {
@@ -63,19 +63,19 @@ class AfterRoutineCreateTests(APITestCase):
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 201)
 
-    def test_routine_retrieve(self):
+    def test_routine_단건조회(self):
         url = reverse('routine-detail', kwargs={'pk': self.routine.id})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
 
-    def test_routine_destroy(self):
+    def test_routine_삭제(self):
         url = reverse('routine-detail', kwargs={'pk': self.routine.id})
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, 200)
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 204)
 
-    def test_routine_list(self):
+    def test_routine_목록조회(self):
         url = reverse('routine-list')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, 200)

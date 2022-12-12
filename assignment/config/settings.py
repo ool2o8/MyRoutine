@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     ###추가 설치
     'rest_framework',
     'accounts',
-    'routine',
+    'routines',
 ]
 
 MIDDLEWARE = [
