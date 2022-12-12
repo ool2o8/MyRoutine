@@ -1,5 +1,12 @@
-# assignment
 
+# 단비교육 사전과제
+
+## ERD
+<img src=https://user-images.githubusercontent.com/59391473/207026260-e8acc39c-f941-4148-9160-c9a83cb929b3.png width="350" height="300"/><br>
+
+
+
+## URL
   + **127.0.0.1:8000/accounts**
 
 |CRUD|HTTP|URL|
